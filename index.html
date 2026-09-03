@@ -1,41 +1,65 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Share Link</title>
+<title>FNOTE.ME Clone</title>
 <style>
-body{font-family:sans-serif;background:#f0f2f5;margin:0}
-.header{background:#5b6f9e;color:white;padding:15px;font-size:22px;font-weight:bold}
-.box{margin:15px;background:white;padding:15px;border-radius:8px}
-textarea{width:100%;height:200px;padding:10px;font-size:16px}
-button{width:100%;padding:12px;background:#5b6f9e;color:white;border:none;border-radius:6px;font-size:16px;margin-top:10px}
+body{margin:0;background:#eeeeee;font-family:Arial,sans-serif}
+.header{background:#5b6fb0;padding:10px 15px;display:flex;align-items:center;justify-content:space-between;color:white}
+.logo{font-size:28px;font-weight:bold;letter-spacing:1px}
+.logo span{font-weight:300}
+.menu{border:1px solid white;padding:8px 12px;border-radius:5px}
+.container{padding:15px}
+textarea{width:100%;height:300px;border:1px solid #ccc;border-radius:4px;padding:10px;font-size:16px;box-sizing:border-box}
+.btn{width:100%;background:#5b6fb0;color:white;border:none;padding:12px;border-radius:5px;font-size:18px;margin-top:10px}
+.view-title{font-size:24px;font-weight:bold;margin:20px 15px 10px 15px}
+.view-box{background:white;border:1px solid #ddd;border-radius:4px;padding:15px;margin:0 15px;min-height:200px;white-space:pre-wrap;word-break:break-all;line-height:1.6}
+.view-box a{color:#0645ad}
+#createArea{display:block}
+#viewArea{display:none}
+.linkResult{background:#d9edf7;padding:10px;border-radius:5px;margin-top:10px;word-break:break-all;display:none}
 </style>
 </head>
 <body>
-<div class="header">FNOTE.ME Clone</div>
-<div class="box">
-<textarea id="c" placeholder="Dan link vuot vao day..."></textarea>
-<button onclick="go()">Tao Link</button>
-<a id="l" style="display:block;margin-top:15px;word-break:break-all"></a>
-<div id="v" style="margin-top:15px;white-space:pre-wrap"></div>
+<div class="header"><div class="logo">📝 FNOTE.ME</div><div class="menu">☰</div></div>
+
+<div id="createArea" class="container">
+<textarea id="c" placeholder="Dán nội dung của bạn vào đây..."></textarea>
+<button class="btn" onclick="create()">Tạo Note</button>
+<div id="linkResult" class="linkResult"><b>Link của bạn:</b><br><a id="linkOut" href="" target="_blank"></a></div>
 </div>
+
+<div id="viewArea">
+<div id="title" class="view-title">Untitled</div>
+<div id="content" class="view-box"></div>
+</div>
+
 <script>
-function go(){
+function linkify(t){return t.replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank">$1</a>')}
+function create(){
 let t=document.getElementById('c').value;
-if(!t)return alert('Chua dan gi!');
-let e=btoa(unescape(encodeURIComponent(t)));
-let u=location.origin+location.pathname+'#'+e;
-document.getElementById('l').innerHTML='Link cua ban:<br>'+u;
-document.getElementById('l').href=u;
+if(!t) return alert('Chưa ghi gì!');
+let hash=btoa(unescape(encodeURIComponent(t)));
+let url=location.origin+location.pathname+'#'+hash;
+document.getElementById('linkResult').style.display='block';
+document.getElementById('linkOut').href=url;
+document.getElementById('linkOut').innerHTML=url;
+location.hash=hash;
 }
-window.onload=function(){
-if(location.hash){
+function showNote(){
+if(location.hash.length>1){
 try{
-let d=decodeURIComponent(escape(atob(location.hash.slice(1))));
-document.getElementById('v').innerHTML='<b>Noi dung:</b><br><div style=background:#eee;padding:10px;border-radius:6px>'+d.replace(/\n/g,'<br>')+'</div>';
+let txt=decodeURIComponent(escape(atob(location.hash.substring(1))));
+document.getElementById('createArea').style.display='none';
+document.getElementById('viewArea').style.display='block';
+let now=new Date();
+document.getElementById('title').innerHTML='Untitled '+now.toISOString().slice(0,19).replace('T',' ');
+document.getElementById('content').innerHTML=linkify(txt);
 }catch(e){}
 }
 }
+window.onload=showNote;
+window.onhashchange=showNote;
 </script>
 </body>
 </html>
